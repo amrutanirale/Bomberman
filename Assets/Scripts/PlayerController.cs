@@ -5,9 +5,13 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance = null;
-    public float speed = 1;
+    public float moveSpeed = 1;
     public GameObject bombPrefab;
     public bool isBombActive = false;
+    public int playerNumber = 1;
+    private new Rigidbody rigidbody;
+    private Transform myTransform;
+    public bool canDropBombs=true;
 
     private void Awake()
     {
@@ -16,47 +20,115 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        rigidbody = GetComponent<Rigidbody>();
+        myTransform = transform;
     }
 
     // Update is called once per frame
     void Update()
     {
-        float horizontalMove = Input.GetAxis("Horizontal") * Time.deltaTime * speed;
-        float VerrticalMove = Input.GetAxis("Vertical") * Time.deltaTime * speed;
-
-        transform.position += new Vector3(horizontalMove, 0, VerrticalMove);
-
+        if (playerNumber == 0)
+        {
+            Player1Movement();
+        }
+        else
+        {
+            Player2Movement();
+        }
+        
+       
+    }
+    public void Player1Movement()
+    {
+        if (Input.GetKey(KeyCode.W))
+        {
+            rigidbody.velocity = new Vector3(rigidbody.velocity.x, rigidbody.velocity.y, moveSpeed);
+            myTransform.rotation = Quaternion.Euler(0, 0, 0);
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            rigidbody.velocity = new Vector3(-moveSpeed, rigidbody.velocity.y, rigidbody.velocity.z);
+            myTransform.rotation = Quaternion.Euler(0, 270, 0);
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            rigidbody.velocity = new Vector3(rigidbody.velocity.x, rigidbody.velocity.y, -moveSpeed);
+            myTransform.rotation = Quaternion.Euler(0, 180, 0);
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            rigidbody.velocity = new Vector3(moveSpeed, rigidbody.velocity.y, rigidbody.velocity.z);
+            myTransform.rotation = Quaternion.Euler(0, 90, 0);
+        }
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            DropBomb();
+            GameManager.Instance.Dropbomb(playerNumber, myTransform.position);
         }
     }
 
-    public void DropBomb()
+    public void Player2Movement()
     {
-        GameObject bomb;
-        Vector3 bombPosition= new Vector3(Mathf.RoundToInt(transform.position.x), transform.position.y, Mathf.RoundToInt(transform.position.z));
-        bomb = Instantiate(bombPrefab, bombPosition, Quaternion.identity);
-        isBombActive = true;
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            rigidbody.velocity = new Vector3(rigidbody.velocity.x, rigidbody.velocity.y, moveSpeed);
+            myTransform.rotation = Quaternion.Euler(0, 0, 0);
+        }
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            rigidbody.velocity = new Vector3(-moveSpeed, rigidbody.velocity.y, rigidbody.velocity.z);
+            myTransform.rotation = Quaternion.Euler(0, 270, 0);
+        }
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            rigidbody.velocity = new Vector3(rigidbody.velocity.x, rigidbody.velocity.y, -moveSpeed);
+            myTransform.rotation = Quaternion.Euler(0, 180, 0);
+        }
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            rigidbody.velocity = new Vector3(moveSpeed, rigidbody.velocity.y, rigidbody.velocity.z);
+            myTransform.rotation = Quaternion.Euler(0, 90, 0);
+        }
+        if (Input.GetKeyDown(KeyCode.RightShift))
+        {
+            GameManager.Instance.Dropbomb(playerNumber, myTransform.position);
+        }
     }
+    //public void DropBomb()
+    //{
+    //    GameObject bomb;
+    //    Vector3 bombPosition= new Vector3(Mathf.RoundToInt(transform.position.x), transform.position.y-0.2f, Mathf.RoundToInt(transform.position.z));
+    //    bomb = Instantiate(bombPrefab, bombPosition, Quaternion.identity);
+    //    isBombActive = true;
+    //}
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag=="Explosion")
+        if (other.CompareTag("Pickups"))
         {
-            Destroy(gameObject);
-        }
-        if (other.gameObject.tag == "Speedboost")
-        {
+            string pickupName = other.gameObject.name;
+
+            switch (pickupName)
+            {
+                case "LongBlast":
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupsTypes.LongBlast,playerNumber);
+                    break;
+                case "MoreBombs":
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupsTypes.MoreBombs,playerNumber);
+                    break;
+                case "SpeedBoost":
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupsTypes.SpeedBoost,playerNumber);
+                    break;
+                case "RCBomb":
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupsTypes.RCBomb,playerNumber);
+                    break;
+            }
             Destroy(other.gameObject);
-            speed +=1;
-            Invoke("RegularSpeed", 5f);
         }
+        
     }
     private void RegularSpeed()
     {
-        speed -= 1f;
+        moveSpeed -= 1f;
     }
 }
 

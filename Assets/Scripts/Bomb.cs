@@ -4,23 +4,47 @@ using UnityEngine;
 
 public class Bomb : MonoBehaviour
 {
-    public GameObject explosion;
+    public static Bomb Instance = null;
+    public GameObject explosionPrefab;
     public LayerMask obstacleLayerMask;
+   
+    public int blastRadius = 1;
+    public int placedByPlayer = 1;
+    public bool isRCBomb;
     private bool exploded = false;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     // Use this for initialization
     void Start()
     {
-        Invoke("BombExplosion", 5f);
+        if (!isRCBomb)
+        {
+            Invoke("BombExplosion", 5f);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (isRCBomb)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftControl) && placedByPlayer == 0)
+            {
+                BombExplosion();
+            }
+            if(Input.GetKeyDown(KeyCode.RightControl) && placedByPlayer == 1)
+            {
+                BombExplosion();
+            }
+        }
     }
     void BombExplosion()
     {
-        Instantiate(explosion, transform.position, Quaternion.identity);
+        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
 
         StartCoroutine(CreateExplosions(Vector3.forward));
         StartCoroutine(CreateExplosions(Vector3.right));
@@ -28,7 +52,8 @@ public class Bomb : MonoBehaviour
         StartCoroutine(CreateExplosions(Vector3.left));
 
         GetComponent<MeshRenderer>().enabled = false;
-        //transform.Find("Collider").gameObject.SetActive(false);
+        transform.Find("Collider").gameObject.SetActive(false);
+        GameManager.Instance.BombExploded(placedByPlayer, isRCBomb);
         Destroy(gameObject, 0.5f);
         PlayerController.Instance.isBombActive = false;
         exploded = true;
@@ -42,33 +67,43 @@ public class Bomb : MonoBehaviour
             CancelInvoke("BombExplosion");
             BombExplosion();
         }
-        if (other.CompareTag("BrickWall"))
-        {
-            Destroy(gameObject);
-            Destroy(other.gameObject);
-        }
+        
     }
     private IEnumerator CreateExplosions(Vector3 direction)
     {
-        for (int i = 1; i < 3; i++)
+        for (int i = 1; i <= blastRadius; i++)
         {
             Physics.Raycast(transform.position , direction, out RaycastHit hit, i,obstacleLayerMask);
 
-            if (!hit.collider)
+            if (hit.collider)
             {
-                Instantiate(explosion, transform.position + (i * direction), explosion.transform.rotation);
+                if (hit.collider.tag == "DestructibleWall")
+                {
+                    Destroy(hit.collider.gameObject);
+                    Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                    i = blastRadius;
+                }
+                else if (hit.collider.tag == "Pickups")
+                {
+                    Destroy(hit.collider.gameObject);
+                    Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                }
+                else if (hit.collider.tag == "AI")
+                {
+                    Destroy(hit.collider.gameObject);
+                    Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                }
+                else
+                {
+                    break;
+                }
             }
             else
-            if(hit.collider.tag!="HardWall")
             {
-                Destroy(hit.collider.gameObject);
-                
+                Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
             }
+                       
             
-            else
-            {
-                break;
-            }
             yield return new WaitForSeconds(0.05f);
         }
     }
