@@ -130,23 +130,23 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    public void PlayerPickedupPowerUP(PickupsTypes pickup,int playerNumber)
+    public void PlayerPickedupPowerUP(PickupTypes pickup,int playerNumber)
     {
         switch (pickup)
         {
-            case PickupsTypes.LongBlast:
+            case PickupTypes.LongBlast:
                 e_playerPickups[playerNumber].bombBlastRadius++;
                 print("LongBlast");
                 break;
-            case PickupsTypes.MoreBombs:
+            case PickupTypes.MoreBombs:
                 e_playerPickups[playerNumber].bombAmount++;
                 print("MoreBombs");
                 break;
-            case PickupsTypes.RCBomb:
+            case PickupTypes.RCBomb:
                 e_playerPickups[playerNumber].isRCBombActive = true;
                 print("RCBomb");
                 break;
-            case PickupsTypes.SpeedBoost:
+            case PickupTypes.SpeedBoost:
                 e_playerPickups[playerNumber].playerSpeed++;
                 playerGo[playerNumber].GetComponent<PlayerController>().moveSpeed += 1;
                 print("SpeedBoost");

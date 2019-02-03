@@ -1,4 +1,4 @@
-﻿public enum PickupsTypes
+﻿public enum PickupTypes
 {
     LongBlast,
     MoreBombs,

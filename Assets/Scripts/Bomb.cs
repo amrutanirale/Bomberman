@@ -82,11 +82,16 @@ public class Bomb : MonoBehaviour
                     Destroy(hit.collider.gameObject);
                     Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
                     i = blastRadius;
+                    if (Random.value <= 0.3)
+                    {
+                        SpwanPickups.Instance.SpawnPickup(hit.collider.gameObject.transform.position);
+                    }
                 }
                 else if (hit.collider.tag == "Pickups")
                 {
                     Destroy(hit.collider.gameObject);
                     Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                    
                 }
                 else if (hit.collider.tag == "AI")
                 {

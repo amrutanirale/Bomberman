@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 3849372636859584090}
   - component: {fileID: 3849372636859584091}
   m_Layer: 9
-  m_Name: SpeedBoost
-  m_TagString: Pickups
+  m_Name: AI
+  m_TagString: AI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -58,7 +58,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fb5ccef556ccbd6408bfa59c60f41e21, type: 2}
+  - {fileID: 2100000, guid: 0bafe3ff5e678ea4593179e8866d4a83, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

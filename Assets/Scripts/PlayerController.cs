@@ -110,16 +110,16 @@ public class PlayerController : MonoBehaviour
             switch (pickupName)
             {
                 case "LongBlast":
-                    GameManager.Instance.PlayerPickedupPowerUP(PickupsTypes.LongBlast,playerNumber);
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.LongBlast,playerNumber);
                     break;
                 case "MoreBombs":
-                    GameManager.Instance.PlayerPickedupPowerUP(PickupsTypes.MoreBombs,playerNumber);
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.MoreBombs,playerNumber);
                     break;
                 case "SpeedBoost":
-                    GameManager.Instance.PlayerPickedupPowerUP(PickupsTypes.SpeedBoost,playerNumber);
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.SpeedBoost,playerNumber);
                     break;
                 case "RCBomb":
-                    GameManager.Instance.PlayerPickedupPowerUP(PickupsTypes.RCBomb,playerNumber);
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.RCBomb,playerNumber);
                     break;
             }
             Destroy(other.gameObject);
