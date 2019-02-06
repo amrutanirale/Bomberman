@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,21 +9,23 @@ public class PlayerController : MonoBehaviour
     public int playerNumber = 1;
     private new Rigidbody rigidbody;
     private Transform myTransform;
-    public bool canDropBombs=true;
+    public bool canDropBombs = true;
+    public bool isPlayerDead = false;
 
     private void Awake()
     {
         Instance = this;
     }
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
         myTransform = transform;
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (playerNumber == 0)
         {
@@ -35,8 +35,8 @@ public class PlayerController : MonoBehaviour
         {
             Player2Movement();
         }
-        
-       
+
+
     }
     public void Player1Movement()
     {
@@ -110,21 +110,25 @@ public class PlayerController : MonoBehaviour
             switch (pickupName)
             {
                 case "LongBlast":
-                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.LongBlast,playerNumber);
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.LongBlast, playerNumber);
                     break;
                 case "MoreBombs":
-                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.MoreBombs,playerNumber);
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.MoreBombs, playerNumber);
                     break;
                 case "SpeedBoost":
-                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.SpeedBoost,playerNumber);
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.SpeedBoost, playerNumber);
                     break;
                 case "RCBomb":
-                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.RCBomb,playerNumber);
+                    GameManager.Instance.PlayerPickedupPowerUP(PickupTypes.RCBomb, playerNumber);
                     break;
             }
             Destroy(other.gameObject);
         }
-        
+        if (other.CompareTag("Explosion") || other.CompareTag("AI"))
+        {
+            GameManager.Instance.PlayerDead(playerNumber);
+            isPlayerDead = true;
+        }
     }
     private void RegularSpeed()
     {

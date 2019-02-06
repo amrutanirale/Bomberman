@@ -1,30 +1,47 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance = null;
-
-    int numberOfPlayersInGame    = 2;
+    private int numberOfPlayersInGame = 2;
     public Pickups[] e_playerPickups;
     public GameObject[] playerGo;
     public GameObject playerPrefab, bombPrefab;
-    float[] f_RCBombTimer;
-    int[] i_tempBombAmount;
+    private float[] f_RCBombTimer;
+    private int[] i_tempBombAmount;
+    private float f_levelTime;
+    private bool isGameStarted = false;
+    private bool isGameOver = false;
+    private int deadPlayers = 0;
+    private int deadPlayerNumber = -1;
+    public Text levelTimerText, winingStatusText;
+    public GameObject gameOverPanel;
+
     private void Awake()
     {
         Instance = this;
     }
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
+
         InitializeVariables();
         SpawnPlayers();
     }
 
-    void InitializeVariables()
+    public void StartGame()
+    {
+        isGameStarted = true;
+    }
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
+    }
+    private void InitializeVariables()
     {
         playerGo = new GameObject[numberOfPlayersInGame];
         e_playerPickups = new Pickups[numberOfPlayersInGame];
@@ -36,15 +53,16 @@ public class GameManager : MonoBehaviour
             e_playerPickups[i] = new Pickups(1, 1, 1, false);
             i_tempBombAmount[i] = 1;
         }
+        f_levelTime = GameEventManager.levelTime;
     }
 
-    void SpawnPlayers()
+    private void SpawnPlayers()
     {
-        playerGo[0] = Instantiate(playerPrefab, new Vector3(0, 0.3f, 1), Quaternion.identity);
+        playerGo[0] = Instantiate(playerPrefab, new Vector3(0, 0.3f, 0), Quaternion.identity);
         playerGo[0].GetComponent<PlayerController>().playerNumber = 0;
         playerGo[0].name = "Player" + 0;
 
-        playerGo[1] = Instantiate(playerPrefab, new Vector3(0, 0.3f, -1), Quaternion.identity);
+        playerGo[1] = Instantiate(playerPrefab, new Vector3(MapGeneration.Instance.row - 1, 0.3f, MapGeneration.Instance.column - 1), Quaternion.identity);
         playerGo[1].GetComponent<PlayerController>().playerNumber = 1;
         playerGo[1].name = "Player" + 1;
     }
@@ -62,7 +80,7 @@ public class GameManager : MonoBehaviour
                 bomb.GetComponent<Bomb>().placedByPlayer = playerNumber;
                 bomb.GetComponent<Bomb>().isRCBomb = true;
                 bomb.GetComponent<Bomb>().blastRadius = e_playerPickups[playerNumber].bombBlastRadius;
-                bomb.GetComponent<Renderer>().material.color = Color.green; 
+                bomb.GetComponent<Renderer>().material.color = Color.green;
                 bomb.name = "Bomb";
                 i_tempBombAmount[playerNumber]--;
                 if (i_tempBombAmount[playerNumber] < 0)
@@ -77,7 +95,7 @@ public class GameManager : MonoBehaviour
             {
                 playerGo[playerNumber].GetComponent<PlayerController>().canDropBombs = false;
                 StartCoroutine(PlayerCanPlaceBombs(playerNumber));
-                GameObject bomb = Instantiate(bombPrefab,new Vector3(Mathf.RoundToInt( playerPosition.x),Mathf.RoundToInt(playerPosition.y),
+                GameObject bomb = Instantiate(bombPrefab, new Vector3(Mathf.RoundToInt(playerPosition.x), Mathf.RoundToInt(playerPosition.y),
                     Mathf.RoundToInt(playerPosition.z)), Quaternion.identity);
                 bomb.GetComponent<Bomb>().placedByPlayer = playerNumber;
                 bomb.GetComponent<Bomb>().blastRadius = e_playerPickups[playerNumber].bombBlastRadius;
@@ -87,7 +105,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    IEnumerator PlayerCanPlaceBombs(int playerNumber)
+    private IEnumerator PlayerCanPlaceBombs(int playerNumber)
     {
         yield return new WaitForSeconds(3);
         playerGo[playerNumber].GetComponent<PlayerController>().canDropBombs = true;
@@ -108,12 +126,31 @@ public class GameManager : MonoBehaviour
             e_playerPickups[playerNumber].bombAmount++;
         }
     }
+
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        if (isGameStarted == true)
+        {
+            f_levelTime -= Time.deltaTime;
+            string minutes = Mathf.Floor(f_levelTime / 60).ToString("00");
+            string seconds = Mathf.RoundToInt(f_levelTime % 60).ToString("00");
+
+
+
+            levelTimerText.text = "Timer : " + minutes + ":" + seconds;
+
+            //print(f_levelTime);
+            if (f_levelTime <= 0)
+            {
+                isGameOver = true;
+                levelTimerText.text = "Level End";
+                Invoke("CheckPlayerDeath", 1);
+            }
+        }
     }
-    void LateUpdate()
+
+    private void LateUpdate()
     {
 
         // Updating the players score to UI elements
@@ -130,7 +167,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    public void PlayerPickedupPowerUP(PickupTypes pickup,int playerNumber)
+    public void PlayerPickedupPowerUP(PickupTypes pickup, int playerNumber)
     {
         switch (pickup)
         {
@@ -153,6 +190,39 @@ public class GameManager : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    public void PlayerDead(int playerNumber)
+    {
+        isGameOver = true;
+        playerGo[playerNumber].SetActive(false);
+        deadPlayers++;
+        if (deadPlayers == 1)
+        {
+            deadPlayerNumber = playerNumber;
+            Invoke("CheckPlayerDeath", 1);
+        }
+    }
+
+    public void CheckPlayerDeath()
+    {
+
+        gameOverPanel.gameObject.SetActive(true);
+        if (deadPlayers == 1)
+        {
+            if (deadPlayerNumber == 1)
+            {
+                winingStatusText.text = "player 1 wins";
+            }
+            else
+            {
+                winingStatusText.text = "player 2 wins";
+            }
+        }
+        else
+        {
+            winingStatusText.text = "Match Draw";
         }
     }
 }

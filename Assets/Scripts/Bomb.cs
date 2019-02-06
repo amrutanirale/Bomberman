@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Bomb : MonoBehaviour
@@ -7,7 +6,7 @@ public class Bomb : MonoBehaviour
     public static Bomb Instance = null;
     public GameObject explosionPrefab;
     public LayerMask obstacleLayerMask;
-   
+
     public int blastRadius = 1;
     public int placedByPlayer = 1;
     public bool isRCBomb;
@@ -19,7 +18,7 @@ public class Bomb : MonoBehaviour
     }
 
     // Use this for initialization
-    void Start()
+    private void Start()
     {
         if (!isRCBomb)
         {
@@ -28,7 +27,7 @@ public class Bomb : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (isRCBomb)
         {
@@ -36,13 +35,14 @@ public class Bomb : MonoBehaviour
             {
                 BombExplosion();
             }
-            if(Input.GetKeyDown(KeyCode.RightControl) && placedByPlayer == 1)
+            if (Input.GetKeyDown(KeyCode.RightControl) && placedByPlayer == 1)
             {
                 BombExplosion();
             }
         }
     }
-    void BombExplosion()
+
+    private void BombExplosion()
     {
         Instantiate(explosionPrefab, transform.position, Quaternion.identity);
 
@@ -61,19 +61,19 @@ public class Bomb : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        
+
         if (!exploded && other.CompareTag("Explosion"))
         {
             CancelInvoke("BombExplosion");
             BombExplosion();
         }
-        
+
     }
     private IEnumerator CreateExplosions(Vector3 direction)
     {
         for (int i = 1; i <= blastRadius; i++)
         {
-            Physics.Raycast(transform.position , direction, out RaycastHit hit, i,obstacleLayerMask);
+            Physics.Raycast(transform.position, direction, out RaycastHit hit, i, obstacleLayerMask);
 
             if (hit.collider)
             {
@@ -91,12 +91,16 @@ public class Bomb : MonoBehaviour
                 {
                     Destroy(hit.collider.gameObject);
                     Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
-                    
+
                 }
                 else if (hit.collider.tag == "AI")
                 {
                     Destroy(hit.collider.gameObject);
                     Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                }
+                else if (hit.collider.tag == "Player")
+                {
+                    Destroy(hit.collider.gameObject);
                 }
                 else
                 {
@@ -107,8 +111,8 @@ public class Bomb : MonoBehaviour
             {
                 Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
             }
-                       
-            
+
+
             yield return new WaitForSeconds(0.05f);
         }
     }
