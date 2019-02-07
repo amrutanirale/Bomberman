@@ -17,8 +17,9 @@ public class GameManager : MonoBehaviour
     private bool isGameOver = false;
     private int deadPlayers = 0;
     private int deadPlayerNumber = -1;
-    public Text levelTimerText, winingStatusText;
-    public GameObject gameOverPanel;
+    public Text levelTimerText, winingStatusText, player1ScoreText, player2ScoreText, p1ScoreText, p2ScoreText;
+    public Text[] bombRadiusText, playerSpeedText, noOfBombText, rcBombText;
+    public GameObject gameOverPanel, scoreBoard;
 
     private void Awake()
     {
@@ -28,19 +29,21 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-
         InitializeVariables();
         SpawnPlayers();
+        UpdateScore();
     }
 
     public void StartGame()
     {
         isGameStarted = true;
     }
+
     public void RestartGame()
     {
         SceneManager.LoadScene(0);
     }
+
     private void InitializeVariables()
     {
         playerGo = new GameObject[numberOfPlayersInGame];
@@ -135,27 +138,35 @@ public class GameManager : MonoBehaviour
             f_levelTime -= Time.deltaTime;
             string minutes = Mathf.Floor(f_levelTime / 60).ToString("00");
             string seconds = Mathf.RoundToInt(f_levelTime % 60).ToString("00");
-
-
-
             levelTimerText.text = "Timer : " + minutes + ":" + seconds;
 
-            //print(f_levelTime);
             if (f_levelTime <= 0)
             {
                 isGameOver = true;
-                levelTimerText.text = "Level End";
+                levelTimerText.text = "00:00";
                 Invoke("CheckPlayerDeath", 1);
             }
         }
     }
+    private void UpdateScore()
+    {
+        player1ScoreText.text = "Score " + PlayerPrefs.GetInt("player1Score");
+        player2ScoreText.text = "Score " + PlayerPrefs.GetInt("player2Score");
+        p1ScoreText.text = PlayerPrefs.GetInt("player1Score").ToString();
+        p2ScoreText.text = PlayerPrefs.GetInt("player2Score").ToString();
 
+
+    }
     private void LateUpdate()
     {
-
         // Updating the players score to UI elements
         for (int i = 0; i < numberOfPlayersInGame; i++)
         {
+            noOfBombText[i].text = e_playerPickups[i].bombAmount.ToString();
+            bombRadiusText[i].text = e_playerPickups[i].bombBlastRadius.ToString();
+            playerSpeedText[i].text = e_playerPickups[i].playerSpeed.ToString();
+            rcBombText[i].text = e_playerPickups[i].isRCBombActive.ToString();
+
             if (e_playerPickups[i].isRCBombActive == true)
             {
                 f_RCBombTimer[i] -= Time.deltaTime;
@@ -207,23 +218,27 @@ public class GameManager : MonoBehaviour
 
     public void CheckPlayerDeath()
     {
-
-        gameOverPanel.gameObject.SetActive(true);
+        scoreBoard.SetActive(false);
+        gameOverPanel.SetActive(true);
         if (deadPlayers == 1)
         {
             if (deadPlayerNumber == 1)
             {
                 winingStatusText.text = "player 1 wins";
+                PlayerPrefs.SetInt("player1Score", PlayerPrefs.GetInt("player1Score") + 1);
             }
             else
             {
                 winingStatusText.text = "player 2 wins";
+                PlayerPrefs.SetInt("player2Score", PlayerPrefs.GetInt("player2Score") + 1);
+
             }
         }
         else
         {
             winingStatusText.text = "Match Draw";
         }
+        UpdateScore();
     }
 }
 public class Pickups
