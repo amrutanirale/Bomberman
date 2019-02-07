@@ -2004,11 +2004,10 @@ MonoBehaviour:
     type: 3}
   destructibleWallPrefab: {fileID: 292470515705330859, guid: 570bc134535712647a8b6e2f296874eb,
     type: 3}
-  aiPrefab: {fileID: 3849372636859584088, guid: b45ac4a1354bf1342baf7672d3e893bd,
-    type: 3}
+  aiPrefab: {fileID: 149814102031420986, guid: 93b20cf18a5e40a4ea1e1510d45ae9c5, type: 3}
   floorPrefab: {fileID: 2071013058}
-  row: 7
-  column: 7
+  row: 11
+  column: 11
 --- !u!4 &1098911667
 Transform:
   m_ObjectHideFlags: 0

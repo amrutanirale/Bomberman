@@ -192,6 +192,8 @@ public class GameManager : MonoBehaviour
                 break;
             case PickupTypes.RCBomb:
                 e_playerPickups[playerNumber].isRCBombActive = true;
+                f_RCBombTimer[playerNumber] = 10;
+
                 print("RCBomb");
                 break;
             case PickupTypes.SpeedBoost:

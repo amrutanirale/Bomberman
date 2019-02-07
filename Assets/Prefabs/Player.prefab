@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 3535796581074364262}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.97, y: 0.312, z: 0.94}
-  m_LocalScale: {x: 0.88, y: 0.88, z: 0.88}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -110,6 +110,9 @@ MonoBehaviour:
   bombPrefab: {fileID: 1355036407098734857, guid: fe3039f5e5dcc754d95c1efc9c119377,
     type: 3}
   isBombActive: 0
+  playerNumber: 1
+  canDropBombs: 1
+  isPlayerDead: 0
 --- !u!54 &3535796581074364287
 Rigidbody:
   m_ObjectHideFlags: 0

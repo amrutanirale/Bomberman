@@ -65,7 +65,7 @@ public class MapGeneration : MonoBehaviour
 
                 if (i % 2 == 0 || j % 2 == 0)
                 {
-                    if (Random.value <= 0.9f)
+                    if (Random.value <= 0.3f)
                     {
                         if (Random.value <= 0.2f)
                         {
