@@ -13,7 +13,7 @@ public class MapGeneration : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    private void Start()
+    public void GenerateMap()
     {
         GenerateFloor();
         GenerateBorder();
@@ -67,7 +67,7 @@ public class MapGeneration : MonoBehaviour
                 {
                     if (Random.value <= 0.3f)
                     {
-                        if (Random.value <= 0.2f)
+                        if (Random.value <= 0.5f)
                         {
                             GameObject ai = Instantiate(aiPrefab, new Vector3(i, 0, j), Quaternion.identity, transform.GetChild(2).transform);
                         }
