@@ -29,7 +29,7 @@ public class AI : MonoBehaviour
         transform.position += transform.forward * aiSpeed * Time.deltaTime;
         RaycastHit hit;
         Physics.Raycast(transform.position, Vector3.back, out hit);
-        if (!hit.collider.CompareTag("Player"))
+        if (hit.collider)
         {
             if (hit.distance > 1)
             {
@@ -38,7 +38,7 @@ public class AI : MonoBehaviour
             }
         }
         Physics.Raycast(transform.position, Vector3.left, out hit);
-        if (!hit.collider.CompareTag("Player"))
+        if (hit.collider)
         {
             if (hit.distance > 1)
             {
@@ -47,7 +47,7 @@ public class AI : MonoBehaviour
             }
         }
         Physics.Raycast(transform.position, Vector3.right, out hit);
-        if (!hit.collider.CompareTag("Player"))
+        if (hit.collider)
         {
             if (hit.distance > 1)
             {
@@ -56,7 +56,7 @@ public class AI : MonoBehaviour
             }
         }
         Physics.Raycast(transform.position, Vector3.forward, out hit);
-        if (!hit.collider.CompareTag("Player"))
+        if (hit.collider)
         {
             if (hit.distance > 1)
             {

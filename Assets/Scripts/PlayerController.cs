@@ -27,15 +27,17 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (playerNumber == 0)
+        if (GameManager.Instance.isGameStarted == true)
         {
-            Player1Movement();
+            if (playerNumber == 0)
+            {
+                Player1Movement();
+            }
+            else
+            {
+                Player2Movement();
+            }
         }
-        else
-        {
-            Player2Movement();
-        }
-
 
     }
     public void Player1Movement()

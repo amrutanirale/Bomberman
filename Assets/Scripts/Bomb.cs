@@ -82,7 +82,7 @@ public class Bomb : MonoBehaviour
                     Destroy(hit.collider.gameObject);
                     Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
                     i = blastRadius;
-                    if (Random.value <= 0.3)
+                    if (Random.value <= GameEventManager.spawnPickupProbability)
                     {
                         SpwanPickups.Instance.SpawnPickup(hit.collider.gameObject.transform.position);
                     }

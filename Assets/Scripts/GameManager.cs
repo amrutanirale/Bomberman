@@ -13,8 +13,8 @@ public class GameManager : MonoBehaviour
     private float[] f_RCBombTimer;
     private int[] i_tempBombAmount;
     private float f_levelTime;
-    private bool isGameStarted = false;
-    private bool isGameOver = false;
+    public bool isGameStarted = false;
+    public bool isGameOver = false;
     private int deadPlayers = 0;
     private int deadPlayerNumber = -1;
     public Text levelTimerText, winingStatusText, player1ScoreText, player2ScoreText, p1ScoreText, p2ScoreText;
@@ -64,10 +64,13 @@ public class GameManager : MonoBehaviour
         playerGo[0] = Instantiate(playerPrefab, new Vector3(0, 0.3f, 0), Quaternion.identity);
         playerGo[0].GetComponent<PlayerController>().playerNumber = 0;
         playerGo[0].name = "Player" + 0;
+        playerGo[0].GetComponent<Renderer>().material.color = Color.red;
 
         playerGo[1] = Instantiate(playerPrefab, new Vector3(MapGeneration.Instance.row - 1, 0.3f, MapGeneration.Instance.column - 1), Quaternion.identity);
         playerGo[1].GetComponent<PlayerController>().playerNumber = 1;
         playerGo[1].name = "Player" + 1;
+        playerGo[1].GetComponent<Renderer>().material.color = Color.green;
+
     }
 
     public void Dropbomb(int playerNumber, Vector3 playerPosition)

@@ -749,6 +749,8 @@ MonoBehaviour:
     type: 3}
   bombPrefab: {fileID: 1355036407098734857, guid: fe3039f5e5dcc754d95c1efc9c119377,
     type: 3}
+  isGameStarted: 0
+  isGameOver: 0
   levelTimerText: {fileID: 1256109654}
   winingStatusText: {fileID: 1850471913}
   player1ScoreText: {fileID: 1550715269}
@@ -815,7 +817,7 @@ GameObject:
   - component: {fileID: 372603115}
   - component: {fileID: 372603114}
   m_Layer: 5
-  m_Name: Text
+  m_Name: PlayerSpeedText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1135,7 +1137,7 @@ GameObject:
   - component: {fileID: 552851811}
   - component: {fileID: 552851810}
   m_Layer: 5
-  m_Name: Text
+  m_Name: BombBlastText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1753,7 +1755,7 @@ GameObject:
   - component: {fileID: 948441224}
   - component: {fileID: 948441223}
   m_Layer: 5
-  m_Name: Text
+  m_Name: NoOfBombsText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2006,8 +2008,10 @@ MonoBehaviour:
     type: 3}
   aiPrefab: {fileID: 149814102031420986, guid: 93b20cf18a5e40a4ea1e1510d45ae9c5, type: 3}
   floorPrefab: {fileID: 2071013058}
-  row: 7
-  column: 7
+  row: 9
+  column: 9
+  aiSpawnProb: 20
+  destructibleWallSpawnProb: 30
 --- !u!4 &1098911667
 Transform:
   m_ObjectHideFlags: 0
@@ -2037,7 +2041,7 @@ GameObject:
   - component: {fileID: 1178902512}
   - component: {fileID: 1178902511}
   m_Layer: 5
-  m_Name: Text
+  m_Name: RCBombText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2515,7 +2519,7 @@ GameObject:
   - component: {fileID: 1441997231}
   - component: {fileID: 1441997230}
   m_Layer: 5
-  m_Name: Text
+  m_Name: RCBombText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3001,7 +3005,7 @@ GameObject:
   - component: {fileID: 1738502391}
   - component: {fileID: 1738502390}
   m_Layer: 5
-  m_Name: Text
+  m_Name: PlayerSpeedText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3080,7 +3084,7 @@ GameObject:
   - component: {fileID: 1743345494}
   - component: {fileID: 1743345493}
   m_Layer: 5
-  m_Name: Text
+  m_Name: NoOfBombsText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3546,7 +3550,7 @@ GameObject:
   - component: {fileID: 1972378311}
   - component: {fileID: 1972378310}
   m_Layer: 5
-  m_Name: Text
+  m_Name: BombBlastText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

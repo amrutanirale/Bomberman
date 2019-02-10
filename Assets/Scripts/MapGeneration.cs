@@ -6,12 +6,26 @@ public class MapGeneration : MonoBehaviour
     public GameObject indestructibleWallPrefab, destructibleWallPrefab, aiPrefab, floorPrefab;
     public int row = 7;
     public int column = 7;
+    [Range(0, 100)]
+    public float aiSpawnProb, destructibleWallSpawnProb;
 
     private void Awake()
     {
         Instance = this;
-    }
+        if (row % 2 == 0)
+        {
+            row++;
+        }
 
+        if (column % 2 == 0)
+        {
+            column++;
+        }
+    }
+    private void Start()
+    {
+
+    }
     // Start is called before the first frame update
     public void GenerateMap()
     {
@@ -65,9 +79,9 @@ public class MapGeneration : MonoBehaviour
 
                 if (i % 2 == 0 || j % 2 == 0)
                 {
-                    if (Random.value <= 0.3f)
+                    if (Random.value <= destructibleWallSpawnProb / 100)
                     {
-                        if (Random.value <= 0.5f)
+                        if (Random.value <= aiSpawnProb / 100)
                         {
                             GameObject ai = Instantiate(aiPrefab, new Vector3(i, 0, j), Quaternion.identity, transform.GetChild(2).transform);
                         }
