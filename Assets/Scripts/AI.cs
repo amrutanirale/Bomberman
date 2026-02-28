@@ -12,6 +12,9 @@ public class AI : MonoBehaviour
     }
     private void Update()
     {
+        if (GameManager.Instance.isGameOver)
+            return;
+
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         charController.SimpleMove(forward * aiSpeed);
         //transform.position += transform.forward * aiSpeed * Time.deltaTime;
@@ -73,10 +76,12 @@ public class AI : MonoBehaviour
     {
         Rigidbody body = hit.collider.attachedRigidbody;
         if (body == null || body.isKinematic)
-        {
             return;
-        }
 
-        GameManager.Instance.PlayerDead(body.gameObject.GetComponent<PlayerController>().playerNumber);
+        PlayerController pc = body.gameObject.GetComponent<PlayerController>();
+        if (pc != null && !pc.isPlayerDead)
+        {
+            GameManager.Instance.PlayerDead(pc.playerNumber);
+        }
     }
 }

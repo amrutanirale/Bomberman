@@ -79,16 +79,13 @@ public class MapGeneration : MonoBehaviour
 
                 if (i % 2 == 0 || j % 2 == 0)
                 {
-                    if (Random.value <= destructibleWallSpawnProb / 100)
+                    if (Random.value <= aiSpawnProb / 100)
                     {
-                        if (Random.value <= aiSpawnProb / 100)
-                        {
-                            GameObject ai = Instantiate(aiPrefab, new Vector3(i, 0, j), Quaternion.identity, transform.GetChild(2).transform);
-                        }
-                        else
-                        {
-                            GameObject dwall = Instantiate(destructibleWallPrefab, new Vector3(i, 0, j), Quaternion.identity, transform.GetChild(1).transform);
-                        }
+                        Instantiate(aiPrefab, new Vector3(i, 0, j), Quaternion.identity, transform.GetChild(2).transform);
+                    }
+                    else if (Random.value <= destructibleWallSpawnProb / 100)
+                    {
+                        Instantiate(destructibleWallPrefab, new Vector3(i, 0, j), Quaternion.identity, transform.GetChild(1).transform);
                     }
                 }
 
