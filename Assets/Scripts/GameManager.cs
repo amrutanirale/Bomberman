@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
         InitializeVariables();
         SpawnPlayers();
         UpdateScore();
+        new GameObject("MobileControls").AddComponent<MobileControls>();
     }
 
     public void StartGame()

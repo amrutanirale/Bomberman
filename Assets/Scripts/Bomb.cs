@@ -10,6 +10,8 @@ public class Bomb : MonoBehaviour
     public int placedByPlayer = 1;
     public bool isRCBomb;
     private bool exploded = false;
+    // Tracks previous mobile RC-button state for rising-edge detection
+    private bool prevMobileRCDown = false;
 
     // Use this for initialization
     private void Start()
@@ -23,17 +25,20 @@ public class Bomb : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (isRCBomb)
-        {
-            if (Input.GetKeyDown(KeyCode.LeftControl) && placedByPlayer == 0)
-            {
-                BombExplosion();
-            }
-            if (Input.GetKeyDown(KeyCode.RightControl) && placedByPlayer == 1)
-            {
-                BombExplosion();
-            }
-        }
+        if (!isRCBomb) return;
+
+        bool keyDown = (Input.GetKeyDown(KeyCode.LeftControl)  && placedByPlayer == 0)
+                    || (Input.GetKeyDown(KeyCode.RightControl) && placedByPlayer == 1);
+
+        // Rising-edge detection for the mobile RC button so a single tap detonates
+        // exactly once, even though rcPressed stays true for multiple frames.
+        bool curRC = MobileControls.Instance != null
+                     && MobileControls.Instance.rcPressed[placedByPlayer];
+        bool mobileRCJustPressed = curRC && !prevMobileRCDown;
+        prevMobileRCDown = curRC;
+
+        if (keyDown || mobileRCJustPressed)
+            BombExplosion();
     }
 
     private void BombExplosion()

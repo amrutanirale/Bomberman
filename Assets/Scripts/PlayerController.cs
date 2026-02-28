@@ -10,14 +10,17 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Transform myTransform;
 
-    // Start is called before the first frame update
+    // Tracks the previous frame's mobile bomb-button state so we fire only on
+    // the rising edge (PointerDown → true for the first time), matching the
+    // behaviour of Input.GetKeyDown.
+    private bool prevMobileBombDown = false;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         myTransform = transform;
     }
 
-    // Update is called once per frame
     private void Update()
     {
         if (isPlayerDead || !GameManager.Instance.isGameStarted)
@@ -31,58 +34,74 @@ public class PlayerController : MonoBehaviour
 
     public void Player1Movement()
     {
-        if (Input.GetKey(KeyCode.W))
+        // Read mobile directional input (zero when MobileControls not present)
+        Vector2 mobile = MobileControls.Instance != null
+            ? MobileControls.Instance.moveInput[playerNumber]
+            : Vector2.zero;
+
+        if (Input.GetKey(KeyCode.W) || mobile.y > 0)
         {
             rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, moveSpeed);
             myTransform.rotation = Quaternion.Euler(0, 0, 0);
         }
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A) || mobile.x < 0)
         {
             rb.velocity = new Vector3(-moveSpeed, rb.velocity.y, rb.velocity.z);
             myTransform.rotation = Quaternion.Euler(0, 270, 0);
         }
-        if (Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.S) || mobile.y < 0)
         {
             rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, -moveSpeed);
             myTransform.rotation = Quaternion.Euler(0, 180, 0);
         }
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.D) || mobile.x > 0)
         {
             rb.velocity = new Vector3(moveSpeed, rb.velocity.y, rb.velocity.z);
             myTransform.rotation = Quaternion.Euler(0, 90, 0);
         }
-        if (Input.GetKeyDown(KeyCode.Space) && canDropBombs)
-        {
+
+        // Rising-edge detection: only trigger bomb on the frame the button goes down
+        bool curBomb = MobileControls.Instance != null && MobileControls.Instance.bombPressed[playerNumber];
+        bool mobileBombJustPressed = curBomb && !prevMobileBombDown;
+        prevMobileBombDown = curBomb;
+
+        if ((Input.GetKeyDown(KeyCode.Space) || mobileBombJustPressed) && canDropBombs)
             GameManager.Instance.Dropbomb(playerNumber, myTransform.position);
-        }
     }
 
     public void Player2Movement()
     {
-        if (Input.GetKey(KeyCode.UpArrow))
+        Vector2 mobile = MobileControls.Instance != null
+            ? MobileControls.Instance.moveInput[playerNumber]
+            : Vector2.zero;
+
+        if (Input.GetKey(KeyCode.UpArrow) || mobile.y > 0)
         {
             rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, moveSpeed);
             myTransform.rotation = Quaternion.Euler(0, 0, 0);
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) || mobile.x < 0)
         {
             rb.velocity = new Vector3(-moveSpeed, rb.velocity.y, rb.velocity.z);
             myTransform.rotation = Quaternion.Euler(0, 270, 0);
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.DownArrow) || mobile.y < 0)
         {
             rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, -moveSpeed);
             myTransform.rotation = Quaternion.Euler(0, 180, 0);
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) || mobile.x > 0)
         {
             rb.velocity = new Vector3(moveSpeed, rb.velocity.y, rb.velocity.z);
             myTransform.rotation = Quaternion.Euler(0, 90, 0);
         }
-        if (Input.GetKeyDown(KeyCode.RightShift) && canDropBombs)
-        {
+
+        bool curBomb = MobileControls.Instance != null && MobileControls.Instance.bombPressed[playerNumber];
+        bool mobileBombJustPressed = curBomb && !prevMobileBombDown;
+        prevMobileBombDown = curBomb;
+
+        if ((Input.GetKeyDown(KeyCode.RightShift) || mobileBombJustPressed) && canDropBombs)
             GameManager.Instance.Dropbomb(playerNumber, myTransform.position);
-        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -90,7 +109,6 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Pickups"))
         {
             string pickupName = other.gameObject.name;
-
             switch (pickupName)
             {
                 case "LongBlast":
