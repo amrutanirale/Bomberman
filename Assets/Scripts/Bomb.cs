@@ -1,9 +1,8 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 public class Bomb : MonoBehaviour
 {
-    public static Bomb Instance = null;
     public GameObject explosionPrefab;
     public LayerMask obstacleLayerMask;
 
@@ -11,11 +10,6 @@ public class Bomb : MonoBehaviour
     public int placedByPlayer = 1;
     public bool isRCBomb;
     private bool exploded = false;
-
-    private void Awake()
-    {
-        Instance = this;
-    }
 
     // Use this for initialization
     private void Start()
@@ -44,6 +38,9 @@ public class Bomb : MonoBehaviour
 
     private void BombExplosion()
     {
+        if (exploded) return;
+        exploded = true;
+
         Instantiate(explosionPrefab, transform.position, Quaternion.identity);
 
         StartCoroutine(CreateExplosions(Vector3.forward));
@@ -55,20 +52,17 @@ public class Bomb : MonoBehaviour
         transform.Find("Collider").gameObject.SetActive(false);
         GameManager.Instance.BombExploded(placedByPlayer, isRCBomb);
         Destroy(gameObject, 0.5f);
-        PlayerController.Instance.isBombActive = false;
-        exploded = true;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-
         if (!exploded && other.CompareTag("Explosion"))
         {
             CancelInvoke("BombExplosion");
             BombExplosion();
         }
-
     }
+
     private IEnumerator CreateExplosions(Vector3 direction)
     {
         for (int i = 1; i <= blastRadius; i++)
@@ -77,7 +71,7 @@ public class Bomb : MonoBehaviour
 
             if (hit.collider)
             {
-                if (hit.collider.tag == "DestructibleWall")
+                if (hit.collider.CompareTag("DestructibleWall"))
                 {
                     Destroy(hit.collider.gameObject);
                     Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
@@ -87,20 +81,24 @@ public class Bomb : MonoBehaviour
                         SpwanPickups.Instance.SpawnPickup(hit.collider.gameObject.transform.position);
                     }
                 }
-                else if (hit.collider.tag == "Pickups")
-                {
-                    Destroy(hit.collider.gameObject);
-                    Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
-
-                }
-                else if (hit.collider.tag == "AI")
+                else if (hit.collider.CompareTag("Pickups"))
                 {
                     Destroy(hit.collider.gameObject);
                     Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
                 }
-                else if (hit.collider.tag == "Player")
+                else if (hit.collider.CompareTag("AI"))
                 {
                     Destroy(hit.collider.gameObject);
+                    Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                }
+                else if (hit.collider.CompareTag("Player"))
+                {
+                    PlayerController pc = hit.collider.GetComponent<PlayerController>();
+                    if (pc != null && !pc.isPlayerDead)
+                    {
+                        Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                        GameManager.Instance.PlayerDead(pc.playerNumber);
+                    }
                 }
                 else
                 {
@@ -111,7 +109,6 @@ public class Bomb : MonoBehaviour
             {
                 Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
             }
-
 
             yield return new WaitForSeconds(0.05f);
         }

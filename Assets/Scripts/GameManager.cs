@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     private float f_levelTime;
     public bool isGameStarted = false;
     public bool isGameOver = false;
+    private bool gameOverTriggered = false;
     private int deadPlayers = 0;
     private int deadPlayerNumber = -1;
     public Text levelTimerText, winingStatusText, player1ScoreText, player2ScoreText, p1ScoreText, p2ScoreText;
@@ -70,7 +71,6 @@ public class GameManager : MonoBehaviour
         playerGo[1].GetComponent<PlayerController>().playerNumber = 1;
         playerGo[1].name = "Player" + 1;
         playerGo[1].GetComponent<Renderer>().material.color = Color.green;
-
     }
 
     public void Dropbomb(int playerNumber, Vector3 playerPosition)
@@ -114,10 +114,13 @@ public class GameManager : MonoBehaviour
     private IEnumerator PlayerCanPlaceBombs(int playerNumber)
     {
         yield return new WaitForSeconds(3);
-        playerGo[playerNumber].GetComponent<PlayerController>().canDropBombs = true;
+        if (playerGo[playerNumber] != null && playerGo[playerNumber].activeSelf)
+        {
+            playerGo[playerNumber].GetComponent<PlayerController>().canDropBombs = true;
+        }
     }
 
-    public void BombExploded(int playerNumber, bool isRCBomb) // Bomb exploaded incrementing the counter
+    public void BombExploded(int playerNumber, bool isRCBomb) // Bomb exploded incrementing the counter
     {
         if (isRCBomb)
         {
@@ -143,23 +146,24 @@ public class GameManager : MonoBehaviour
             string seconds = Mathf.RoundToInt(f_levelTime % 60).ToString("00");
             levelTimerText.text = "Timer : " + minutes + ":" + seconds;
 
-            if (f_levelTime <= 0)
+            if (f_levelTime <= 0 && !gameOverTriggered)
             {
                 isGameOver = true;
+                gameOverTriggered = true;
                 levelTimerText.text = "00:00";
                 Invoke("CheckPlayerDeath", 1);
             }
         }
     }
+
     private void UpdateScore()
     {
         player1ScoreText.text = "Score " + PlayerPrefs.GetInt("player1Score");
         player2ScoreText.text = "Score " + PlayerPrefs.GetInt("player2Score");
         p1ScoreText.text = PlayerPrefs.GetInt("player1Score").ToString();
         p2ScoreText.text = PlayerPrefs.GetInt("player2Score").ToString();
-
-
     }
+
     private void LateUpdate()
     {
         // Updating the players score to UI elements
@@ -181,28 +185,24 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
     public void PlayerPickedupPowerUP(PickupTypes pickup, int playerNumber)
     {
         switch (pickup)
         {
             case PickupTypes.LongBlast:
                 e_playerPickups[playerNumber].bombBlastRadius++;
-                print("LongBlast");
                 break;
             case PickupTypes.MoreBombs:
                 e_playerPickups[playerNumber].bombAmount++;
-                print("MoreBombs");
                 break;
             case PickupTypes.RCBomb:
                 e_playerPickups[playerNumber].isRCBombActive = true;
                 f_RCBombTimer[playerNumber] = 10;
-
-                print("RCBomb");
                 break;
             case PickupTypes.SpeedBoost:
                 e_playerPickups[playerNumber].playerSpeed++;
                 playerGo[playerNumber].GetComponent<PlayerController>().moveSpeed += 1;
-                print("SpeedBoost");
                 break;
             default:
                 break;
@@ -211,11 +211,16 @@ public class GameManager : MonoBehaviour
 
     public void PlayerDead(int playerNumber)
     {
+        // Guard against duplicate death calls for the same player
+        if (playerGo[playerNumber] == null || !playerGo[playerNumber].activeSelf)
+            return;
+
         isGameOver = true;
         playerGo[playerNumber].SetActive(false);
         deadPlayers++;
-        if (deadPlayers == 1)
+        if (deadPlayers == 1 && !gameOverTriggered)
         {
+            gameOverTriggered = true;
             deadPlayerNumber = playerNumber;
             Invoke("CheckPlayerDeath", 1);
         }
@@ -236,7 +241,6 @@ public class GameManager : MonoBehaviour
             {
                 winingStatusText.text = "player 2 wins";
                 PlayerPrefs.SetInt("player2Score", PlayerPrefs.GetInt("player2Score") + 1);
-
             }
         }
         else
@@ -246,6 +250,7 @@ public class GameManager : MonoBehaviour
         UpdateScore();
     }
 }
+
 public class Pickups
 {
     public int bombAmount;
